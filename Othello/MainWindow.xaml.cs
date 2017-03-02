@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Othello.AI;
+using System;
 using System.Media;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Othello
 {
@@ -28,7 +22,13 @@ namespace Othello
         private BitmapImage bmpimgCoinWhite = new BitmapImage(new Uri("pack://application:,,,/Images/DiscWhite.png"));
         private BitmapImage bmpimgCoinBlack = new BitmapImage(new Uri("pack://application:,,,/Images/DiscBlack.png"));
 
-        public MainWindow()
+        //private bool skyNetActivated = true;
+
+        private SkyNet skyNet = new SkyNet();
+
+        public OthelloImage[,] ImageMatrix { get { return this.imageMatrix; } set { this.imageMatrix = value; } }
+
+    public MainWindow()
         {
             InitializeComponent();
             AddImages();
@@ -103,12 +103,12 @@ namespace Othello
             }
         }
 
-        private void Image_MouseDown(object sender, MouseButtonEventArgs e)
+        private async void Image_MouseDown(object sender, MouseButtonEventArgs e)
         {
             var othelloImage = (OthelloImage)sender;
             //MessageBox.Show("Hello x=" + othelloImage.X + " " + imageMatrix[othelloImage.X, othelloImage.Y].X + " and y=" + othelloImage.Y + " " + imageMatrix[othelloImage.X, othelloImage.Y].Y);
 
-            if(!allowedPlacement(othelloImage))
+            if (!allowedPlacement(othelloImage, true))
             {
                 //MessageBox.Show("You are not allowed to place your disc here");
 
@@ -144,9 +144,30 @@ namespace Othello
             }
 
             NextPlayer(true);
+
+            await System.Threading.Tasks.Task.Delay(1);
+
+            TryRunSkyNet();
+        }
+    
+        private void TryRunSkyNet()
+        {
+            Tuple<int, int> skyNetResult = null;
+
+            if (SkyNetEnabled.IsChecked == true && whoseTurn == OthelloDisc.black)
+            {
+                skyNetResult = skyNet.NextMove(this);
+                if (skyNetResult != null)
+                {
+                    allowedPlacement(imageMatrix[skyNetResult.Item1, skyNetResult.Item2], true);
+                    imageMatrix[skyNetResult.Item1, skyNetResult.Item2].ChangeToBlack();
+                }
+
+                NextPlayer(true);
+            }
         }
 
-        private bool allowedPlacement(OthelloImage othelloImage)
+        public bool allowedPlacement(OthelloImage othelloImage, bool flipDiscs)
         {
             int offsetX;
             int offsetY;
@@ -157,7 +178,7 @@ namespace Othello
             offsetX = 0;
             offsetY = -1;
 
-            if(checkIfValid(othelloImage, offsetX, offsetY))
+            if(checkIfValid(othelloImage, flipDiscs, offsetX, offsetY))
             {
                 result = true;
             }
@@ -166,7 +187,7 @@ namespace Othello
             offsetX = 1;
             offsetY = -1;
 
-            if (checkIfValid(othelloImage, offsetX, offsetY))
+            if (checkIfValid(othelloImage, flipDiscs, offsetX, offsetY))
             {
                 result = true;
             }
@@ -175,7 +196,7 @@ namespace Othello
             offsetX = 1;
             offsetY = 0;
 
-            if (checkIfValid(othelloImage, offsetX, offsetY))
+            if (checkIfValid(othelloImage, flipDiscs, offsetX, offsetY))
             {
                 result = true;
             }
@@ -184,7 +205,7 @@ namespace Othello
             offsetX = 1;
             offsetY = 1;
 
-            if (checkIfValid(othelloImage, offsetX, offsetY))
+            if (checkIfValid(othelloImage, flipDiscs, offsetX, offsetY))
             {
                 result = true;
             }
@@ -193,7 +214,7 @@ namespace Othello
             offsetX = 0;
             offsetY = 1;
 
-            if (checkIfValid(othelloImage, offsetX, offsetY))
+            if (checkIfValid(othelloImage, flipDiscs, offsetX, offsetY))
             {
                 result = true;
             }
@@ -202,7 +223,7 @@ namespace Othello
             offsetX = -1;
             offsetY = 1;
 
-            if (checkIfValid(othelloImage, offsetX, offsetY))
+            if (checkIfValid(othelloImage, flipDiscs, offsetX, offsetY))
             {
                 result = true;
             }
@@ -212,7 +233,7 @@ namespace Othello
             offsetX = -1;
             offsetY = 0;
 
-            if (checkIfValid(othelloImage, offsetX, offsetY))
+            if (checkIfValid(othelloImage, flipDiscs, offsetX, offsetY))
             {
                 result = true;
             }
@@ -222,7 +243,7 @@ namespace Othello
             offsetX = -1;
             offsetY = -1;
 
-            if (checkIfValid(othelloImage, offsetX, offsetY))
+            if (checkIfValid(othelloImage, flipDiscs, offsetX, offsetY))
             {
                 result = true;
             }
@@ -230,7 +251,8 @@ namespace Othello
             return result;
         }
 
-        private bool checkIfValid(OthelloImage othelloImage, int offsetX, int offsetY)
+
+        private bool checkIfValid(OthelloImage othelloImage, bool flipDiscs, int offsetX, int offsetY)
         {
             OthelloImage nextOImg;
             bool result = false;
@@ -261,7 +283,7 @@ namespace Othello
             {
             }
 
-            if (result == true)
+            if (result == true && flipDiscs == true)
             {
                 // flip discs
                 x = othelloImage.X;
@@ -297,7 +319,7 @@ namespace Othello
             int nrOfWhite = 0;
             int nrOfBlack = 0;
 
-            if(whoseTurn == OthelloDisc.white)
+            if (whoseTurn == OthelloDisc.white)
             {
                 whoseTurn = OthelloDisc.black;
                 imgWhoseTurn.Source = bmpimgCoinBlack;
@@ -382,6 +404,11 @@ namespace Othello
         {
             if (sizeInfo.WidthChanged) this.Width = sizeInfo.NewSize.Height * 1.1;
             else this.Height = sizeInfo.NewSize.Width / 1.1;
+        }
+
+        private void SkyNetEnabled_Checked(object sender, RoutedEventArgs e)
+        {
+            TryRunSkyNet();
         }
     }
 }

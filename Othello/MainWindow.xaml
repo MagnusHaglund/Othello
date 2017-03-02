@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Othello"
         mc:Ignorable="d"
-        Title="Othello"  MinHeight="500" MinWidth="550" Height="500" Width="550" Background="Black">
+        Title="Othello"  MinHeight="600" MinWidth="660" Height="600" Width="660" Background="Black">
 
     <Window.Resources>
         <Storyboard x:Key="FlashGridBorder" Duration="00:00:1" >
@@ -72,6 +72,7 @@
         </Border>
 
         <StackPanel Grid.Column="1" Grid.Row="0">
+            <Label Margin="10,10,10,10"></Label>
             <Label  x:Name="lblWhoseTurn" Content="Turn:" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" FontSize="20" FontWeight="Bold"/>
             <Image x:Name="imgWhoseTurn" HorizontalAlignment="Left" Source="Images/DiscWhite.png" Margin="20,20,20,20"/>
         </StackPanel>
@@ -79,12 +80,15 @@
 
         <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Bottom">
 
+            <CheckBox Name="SkyNetEnabled" Foreground="White" Margin="10,10,10,10" Checked="SkyNetEnabled_Checked">Enable SkyNet</CheckBox>
+
             <Border CornerRadius="2" BorderBrush="Gray" BorderThickness="2" Margin="10,10,10,10">
                 <Button x:Name="btnPass"  Content="Pass" MinWidth="75" Click="btnPass_Click"/>
             </Border>
             <Border CornerRadius="2" BorderBrush="Gray" BorderThickness="2" Margin="10,10,10,10">
                 <Button x:Name="btnNewGame"  Content="New game" MinWidth="75" Click="btnNewGame_Click"/>
             </Border>
+            <Label Margin="10,10,10,10"></Label>
         </StackPanel>
 
         <Label x:Name="lblStatus" Content="     Score: White = 2  Black = 2" Grid.Row="1" Foreground="White" FontWeight="Bold" FontSize="14"></Label>
