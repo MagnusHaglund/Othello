@@ -276,6 +276,10 @@ namespace Othello
                             result = true;
                             break;
                         }
+                        else if(nextOImg.Disc == OthelloDisc.none)
+                        {
+                            break;
+                        }
                     }
                 }
             }
@@ -370,6 +374,7 @@ namespace Othello
         private void btnPass_Click(object sender, RoutedEventArgs e)
         {
             NextPlayer(false);
+            TryRunSkyNet();
         }
 
         private void btnNewGame_Click(object sender, RoutedEventArgs e)
