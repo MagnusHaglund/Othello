@@ -18,10 +18,6 @@ node {
     bat "dotnet CycloneDX Othello.sln -o ."
   }
   stage('dependencyTrackPublisher') {
-    try {
-        dependencyTrackPublisher artifact: 'bom.xml', projectId: 'Demo', synchronous: true
-    } catch (e) {
-        echo 'failed'
-    }
+    dependencyTrackPublisher artifact: 'bom.xml', projectId: 'Demo', synchronous: true
   }
 }
