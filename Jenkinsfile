@@ -18,6 +18,6 @@ node {
     bat "dotnet CycloneDX Othello.sln -o ."
   }
   stage('dependencyTrackPublisher') {
-    dependencyTrackPublisher artifact: 'bom.xml', projectId: 'Demo', synchronous: true
+    dependencyTrackPublisher artifact: 'bom.xml', projectId: 'b30ce81d-23a1-4557-847d-0bf0069c59a2', synchronous: true
   }
 }
