@@ -13,6 +13,6 @@ node {
   }
   stage ('Generating Software Bill of Materials') {
     bat "dotnet tool install --global CycloneDX"
-    bat "cyclonedx-bom -o bom.xml"
+    bat "dotnet CycloneDX Othello.sln -o ."
   }
 }
