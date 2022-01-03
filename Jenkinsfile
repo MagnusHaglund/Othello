@@ -19,7 +19,7 @@ node {
   }
   stage('dependencyTrackPublisher') {
     try {
-        dependencyTrackPublisher artifact: 'bom.xml', projectId: 'a65ea72b-5b77-40c5-8b19-fb83525f40eb', synchronous: true
+        dependencyTrackPublisher artifact: 'bom.xml', projectId: 'Demo', synchronous: true
     } catch (e) {
         echo 'failed'
     }
