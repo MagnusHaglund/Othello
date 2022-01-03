@@ -11,4 +11,11 @@ node {
       bat "\"${scannerHome}\\SonarScanner.MSBuild.exe\" end"
     }
   }
+  stage ('Generating Software Bill of Materials') {
+    steps {
+        //Building the dependencies to generate SBoM
+        bat 'dotnet tool install --global CycloneDX'
+        bat 'cyclonedx-bom -o bom.xml'
+    }
+  }
 }
